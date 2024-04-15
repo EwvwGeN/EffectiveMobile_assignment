@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	LogLevel     string     `yaml:"log_level"`
-	HttpConfig HttpConfig `yaml:"http"`
+	LogLevel        string          `yaml:"log_level"`
+	HttpConfig      HttpConfig      `yaml:"http"`
+	ValidatorConfig ValidatorConfig `yaml:"validator"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -26,6 +27,10 @@ func LoadConfig(path string) (*Config, error) {
 	} else {
 		err = loadEnv(&cfg)
 	}
+	if err != nil {
+		return nil, err
+	}
+	err = cfg.ValidatorConfig.checkRegex()
 	if err != nil {
 		return nil, err
 	}

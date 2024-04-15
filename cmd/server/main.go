@@ -5,10 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	v1 "github.com/EwvwGeN/EffectiveMobile_assignment/http/v1"
 	c "github.com/EwvwGeN/EffectiveMobile_assignment/internal/config"
 	l "github.com/EwvwGeN/EffectiveMobile_assignment/internal/logger"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/server"
@@ -33,6 +35,32 @@ func main() {
 	mainCtx, cancel := context.WithCancel(context.Background())
 
 	hserver := server.NewHttpServer(cfg.HttpConfig, logger)
+
+	hserver.RegisterHandler(
+		"/api/cars/add",
+		v1.CarAdd(logger, nil),
+		http.MethodPost,
+	)
+	hserver.RegisterHandler(
+		"/api/car/{carId}",
+		v1.CarGetOne(logger, nil),
+		http.MethodGet,
+	)
+	hserver.RegisterHandler(
+		"/api/cars",
+		v1.CarGetAll(logger, nil, nil),
+		http.MethodGet,
+	)
+	hserver.RegisterHandler(
+		"/api/car/{carId}/edit",
+		v1.CarEdit(logger, cfg.ValidatorConfig, nil),
+		http.MethodPost,
+	)
+	hserver.RegisterHandler(
+		"/api/car/{carId}/delete",
+		v1.CarDelete(logger, nil),
+		http.MethodPost,
+	)
 
 	logger.Info("loading end")
 
