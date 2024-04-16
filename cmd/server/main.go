@@ -14,6 +14,7 @@ import (
 	c "github.com/EwvwGeN/EffectiveMobile_assignment/internal/config"
 	l "github.com/EwvwGeN/EffectiveMobile_assignment/internal/logger"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/server"
+	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/service"
 )
 
 var (
@@ -34,31 +35,33 @@ func main() {
 	logger.Debug("config data", slog.Any("config", cfg))
 	mainCtx, cancel := context.WithCancel(context.Background())
 
+	carService := service.NewCarService(logger, nil, nil)
+
 	hserver := server.NewHttpServer(cfg.HttpConfig, logger)
 
 	hserver.RegisterHandler(
 		"/api/cars/add",
-		v1.CarAdd(logger, nil),
+		v1.CarAdd(logger, carService),
 		http.MethodPost,
 	)
 	hserver.RegisterHandler(
 		"/api/car/{carId}",
-		v1.CarGetOne(logger, nil),
+		v1.CarGetOne(logger, carService),
 		http.MethodGet,
 	)
 	hserver.RegisterHandler(
 		"/api/cars",
-		v1.CarGetAll(logger, nil, nil),
+		v1.CarGetAll(logger, carService, nil),
 		http.MethodGet,
 	)
 	hserver.RegisterHandler(
 		"/api/car/{carId}/edit",
-		v1.CarEdit(logger, cfg.ValidatorConfig, nil),
+		v1.CarEdit(logger, cfg.ValidatorConfig, carService),
 		http.MethodPost,
 	)
 	hserver.RegisterHandler(
 		"/api/car/{carId}/delete",
-		v1.CarDelete(logger, nil),
+		v1.CarDelete(logger, carService),
 		http.MethodPost,
 	)
 
