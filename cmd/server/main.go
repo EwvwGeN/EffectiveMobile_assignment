@@ -10,6 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/EwvwGeN/EffectiveMobile_assignment/http/helper"
+	"github.com/EwvwGeN/EffectiveMobile_assignment/http/parser"
 	v1 "github.com/EwvwGeN/EffectiveMobile_assignment/http/v1"
 	c "github.com/EwvwGeN/EffectiveMobile_assignment/internal/config"
 	l "github.com/EwvwGeN/EffectiveMobile_assignment/internal/logger"
@@ -35,7 +37,12 @@ func main() {
 	logger.Debug("config data", slog.Any("config", cfg))
 	mainCtx, cancel := context.WithCancel(context.Background())
 
-	carService := service.NewCarService(logger, nil, nil)
+	carInfoGetter, err := helper.GetCarInfoGetter(logger, cfg.CarInfoGetterUrl, parser.ParseFromExternalApi)
+	if err != nil {
+		logger.Error("failed to initialise info getter", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+	carService := service.NewCarService(logger, nil, carInfoGetter)
 
 	hserver := server.NewHttpServer(cfg.HttpConfig, logger)
 
