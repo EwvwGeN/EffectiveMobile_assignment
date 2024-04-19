@@ -38,6 +38,7 @@ func CarEdit(logger *slog.Logger, validCfg config.ValidatorConfig, cEdditor carE
 		}
 		log.Debug("got data from request", slog.Any("request_body", req))
 		//TODO: add all_field_is_nil case handling
+		//TODO: check from json in a for statement(?)
 		if req.CarNewData.RegisterNumber != nil && !validator.ValideteByRegex(*req.CarNewData.RegisterNumber, validCfg.RegisterNumberRegex) {
 			log.Info("validate error: incorrect new car register number", slog.String("registe_number", *req.CarNewData.RegisterNumber))
 			http.Error(w, "not valid car register number", http.StatusBadRequest)
@@ -58,17 +59,17 @@ func CarEdit(logger *slog.Logger, validCfg config.ValidatorConfig, cEdditor carE
 			http.Error(w, "not valid car year", http.StatusBadRequest)
 			return
 		}
-		if req.CarNewData.Owner.Name != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Name, validCfg.OwnerNameRegex) {
+		if req.CarNewData.Owner != nil && req.CarNewData.Owner.Name != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Name, validCfg.OwnerNameRegex) {
 			log.Info("validate error: incorrect new owner name", slog.String("owner_name", *req.CarNewData.Owner.Name))
 			http.Error(w, "not valid owner name", http.StatusBadRequest)
 			return
 		}
-		if req.CarNewData.Owner.Surname != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Surname, validCfg.OwnerSurnameRegex) {
+		if req.CarNewData.Owner != nil && req.CarNewData.Owner.Surname != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Surname, validCfg.OwnerSurnameRegex) {
 			log.Info("validate error: incorrect new owner surname", slog.String("owner_surname", *req.CarNewData.Owner.Surname))
 			http.Error(w, "not valid owner surname", http.StatusBadRequest)
 			return
 		}
-		if req.CarNewData.Owner.Patronymic != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Patronymic, validCfg.OwnerPatronymicRegex) {
+		if req.CarNewData.Owner != nil && req.CarNewData.Owner.Patronymic != nil && !validator.ValideteByRegex(*req.CarNewData.Owner.Patronymic, validCfg.OwnerPatronymicRegex) {
 			log.Info("validate error: incorrect new owner patronymic", slog.String("owner_patronymic", *req.CarNewData.Owner.Patronymic))
 			http.Error(w, "not valid owner patronymic", http.StatusBadRequest)
 			return

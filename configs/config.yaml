@@ -2,4 +2,12 @@ log_level: debug
 http:
   port: 9099
   host: localhost
+postgres:
+  db_con_format: postgres
+  db_host: localhost
+  db_port: 5432
+  db_user: user
+  db_pass: pwd
+  db_name: test-db
+  db_tbl_car: car_table
 car_info_getter: http://localhost:8080/info

@@ -20,17 +20,17 @@ type carAllGetter interface {
 	GetAllCars(context.Context, models.PaginationOption, models.Filter) ([]models.Car, error)
 }
 
-type filterAdder interface {
-	AddFilter(filter *models.Filter, name, value string) error
-}
+type filterAdder func(filter *models.Filter, name, value string) error
 
 // query filter fields name
 const (
-	regNumberFieldName = "regNum"
+	regNumberFieldName = "reg_num"
 	markFieldName = "mark"
 	modelFieldName = "model"
 	yearFieldName = "year"
-	ownerFieldName = "owner"
+	ownerNameFieldName = "owner_name"
+	ownerSurnameFieldName = "owner_surname"
+	ownerPatronymicFieldName = "owner_patronymic"
 )
 
 func CarGetOne(logger *slog.Logger, carGetter carOneGetter) http.HandlerFunc {
@@ -73,6 +73,7 @@ func CarGetAll(logger *slog.Logger, carGetter carAllGetter, fAdder filterAdder) 
 		var (
 			pagOption models.PaginationOption
 			filter models.Filter
+			err error
 		)
 		limit := mux.Vars(r)["limit"]
 		offset := mux.Vars(r)["offset"]
@@ -83,47 +84,99 @@ func CarGetAll(logger *slog.Logger, carGetter carAllGetter, fAdder filterAdder) 
 			oint, _ := strconv.Atoi(offset)
 			pagOption.Limit = oint
 		}
-		regNumber := r.URL.Query().Get(regNumberFieldName)
-		err := fAdder.AddFilter(&filter, regNumberFieldName, regNumber)
-		// make error terminating
-		if err != nil {
-			log.Warn("wrong filter",
-			slog.String("field", regNumberFieldName),
-			slog.String("value", regNumber),
-			slog.String("error", err.Error()))
+		queries := r.URL.Query()
+		regNumbers := queries[regNumberFieldName]
+		if len(regNumbers) != 0 {
+			for i := 0; i < len(regNumbers); i++ {
+				// make error terminating
+				err = fAdder(&filter, regNumberFieldName, regNumbers[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", regNumberFieldName),
+					slog.String("value", regNumbers[i]),
+					slog.String("error", err.Error()))
+				}
+			}
 		}
-		mark := r.URL.Query().Get(markFieldName)
-		err = fAdder.AddFilter(&filter, markFieldName, mark)
-		if err != nil {
-			log.Warn("wrong filter",
-			slog.String("field", markFieldName),
-			slog.String("value", mark),
-			slog.String("error", err.Error()))
+
+		marks := queries[markFieldName]
+		if len(marks) != 0 {
+			for i := 0; i < len(marks); i++ {
+				err = fAdder(&filter, markFieldName, marks[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", markFieldName),
+					slog.String("value", marks[i]),
+					slog.String("error", err.Error()))
+				}
+			}
 		}
-		model := r.URL.Query().Get(modelFieldName)
-		err = fAdder.AddFilter(&filter, modelFieldName, model)
-		if err != nil {
-			log.Warn("wrong filter",
-			slog.String("field", modelFieldName),
-			slog.String("value", model),
-			slog.String("error", err.Error()))
+
+		models := queries[modelFieldName]
+		if len(models) != 0 {
+			for i := 0; i < len(models); i++ {
+				err = fAdder(&filter, modelFieldName, models[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", modelFieldName),
+					slog.String("value", models[i]),
+					slog.String("error", err.Error()))
+				}
+			}
 		}
-		year := r.URL.Query().Get(yearFieldName)
-		err = fAdder.AddFilter(&filter, yearFieldName, year)
-		if err != nil {
-			log.Warn("wrong filter",
-			slog.String("field", yearFieldName),
-			slog.String("value", year),
-			slog.String("error", err.Error()))
+
+		year := queries[yearFieldName]
+		if len(year) != 0 {
+			for i := 0; i < len(year); i++ {
+				err = fAdder(&filter, yearFieldName, year[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", yearFieldName),
+					slog.String("value", year[i]),
+					slog.String("error", err.Error()))
+				}
+			}
 		}
-		owner := r.URL.Query().Get(ownerFieldName)
-		err = fAdder.AddFilter(&filter, ownerFieldName, owner)
-		if err != nil {
-			log.Warn("wrong filter",
-			slog.String("field", ownerFieldName),
-			slog.String("value", owner),
-			slog.String("error", err.Error()))
+
+		ownerNames := queries[ownerNameFieldName]
+		if len(ownerNames) != 0 {
+			for i := 0; i < len(ownerNames); i++ {
+				err = fAdder(&filter, ownerNameFieldName, ownerNames[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", ownerNameFieldName),
+					slog.String("value", ownerNames[i]),
+					slog.String("error", err.Error()))
+				}
+			}
 		}
+
+		ownerSurnames := queries[ownerSurnameFieldName]
+		if len(ownerSurnames) != 0 {
+			for i := 0; i < len(ownerSurnames); i++ {
+				err = fAdder(&filter, ownerSurnameFieldName, ownerSurnames[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", ownerSurnameFieldName),
+					slog.String("value", ownerSurnames[i]),
+					slog.String("error", err.Error()))
+				}
+			}
+		}
+
+		ownerPatronymics := queries[ownerPatronymicFieldName]
+		if len(ownerPatronymics) != 0 {
+			for i := 0; i < len(ownerPatronymics); i++ {
+				err = fAdder(&filter, ownerPatronymicFieldName, ownerPatronymics[i])
+				if err != nil {
+					log.Warn("wrong filter",
+					slog.String("field", ownerPatronymicFieldName),
+					slog.String("value", ownerPatronymics[i]),
+					slog.String("error", err.Error()))
+				}
+			}
+		}
+
 		cars, err := carGetter.GetAllCars(context.Background(), pagOption, filter)
 		if err != nil {
 			log.Error("failed to get cars", slog.String("error", err.Error()))

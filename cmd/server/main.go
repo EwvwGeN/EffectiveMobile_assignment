@@ -17,6 +17,7 @@ import (
 	l "github.com/EwvwGeN/EffectiveMobile_assignment/internal/logger"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/server"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/service"
+	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/storage/postgres"
 )
 
 var (
@@ -42,7 +43,14 @@ func main() {
 		logger.Error("failed to initialise info getter", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-	carService := service.NewCarService(logger, nil, carInfoGetter)
+
+	postgresRepo, err := postgres.NewPostgresProvider(context.Background(), cfg.PostgresConfig)
+	if err != nil {
+		logger.Error("failed to initialise postgres provider", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+
+	carService := service.NewCarService(logger, postgresRepo, carInfoGetter)
 
 	hserver := server.NewHttpServer(cfg.HttpConfig, logger)
 
@@ -58,18 +66,18 @@ func main() {
 	)
 	hserver.RegisterHandler(
 		"/api/cars",
-		v1.CarGetAll(logger, carService, nil),
+		v1.CarGetAll(logger, carService, postgres.AddFilter),
 		http.MethodGet,
 	)
 	hserver.RegisterHandler(
 		"/api/car/{carId}/edit",
 		v1.CarEdit(logger, cfg.ValidatorConfig, carService),
-		http.MethodPost,
+		http.MethodPatch,
 	)
 	hserver.RegisterHandler(
 		"/api/car/{carId}/delete",
 		v1.CarDelete(logger, carService),
-		http.MethodPost,
+		http.MethodDelete,
 	)
 
 	logger.Info("loading end")

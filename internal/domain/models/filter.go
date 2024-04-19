@@ -1,15 +1,12 @@
 package models
 
 type Filter struct {
-	fields []field
+	Fields []Field
 }
 
-type field struct {
-	Name     string
-	Value    string
-	Operator string
-}
-
-func (f *Filter) GetFields() []field {
-	return f.fields
+type Field struct {
+	UnionCondition string
+	Name           string
+	Value          string
+	Operator       string
 }

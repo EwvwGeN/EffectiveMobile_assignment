@@ -53,7 +53,7 @@ func (cs *carService) AddCar(ctx context.Context, regNumbers []string) error {
 	err = cs.carRepo.SaveCars(ctx, carList)
 	if err != nil  {
 		cs.log.Error("failed to save cars", slog.String("error", err.Error()))
-		return err
+		return ErrAddCar
 	}
 	return nil
 }
@@ -64,7 +64,7 @@ func (cs *carService) GetOneCar(ctx context.Context, carId string) (models.Car, 
 	car, err := cs.carRepo.GetCarById(ctx, carId)
 	if err != nil {
 		cs.log.Error("failed to get car by id", slog.String("car_id", carId), slog.String("error", err.Error()))
-		return models.Car{}, err
+		return models.Car{}, ErrGetCar
 	}
 	return car, nil
 }
@@ -78,22 +78,23 @@ func (cs *carService) GetAllCars(ctx context.Context, pOption models.PaginationO
 		slog.Any("pagination_option", pOption),
 		slog.Any("filter", filter),
 		slog.String("error", err.Error()))
-		return nil, err
+		return nil, ErrGetCar
 	}
-	return carList, err
+	return carList, nil
 }
+
 func (cs *carService) EditCar(ctx context.Context, carId string, newData models.CarForPatch) error {
 	cs.log.Info("attempt to edit car by id")
-	cs.log.Debug("got car id", slog.String("car_id", carId))
+	cs.log.Debug("got car data", slog.String("car_id", carId), slog.Any("car_new_data", newData))
 	err := cs.carRepo.UpdateCarById(ctx, carId, newData)
 	if err != nil {
 		cs.log.Error("failed to edit car by id", slog.String("car_id", carId), slog.String("error", err.Error()))
-		return err
+		return ErrEditCar
 	}
 	return nil
 }
 func (cs *carService) DeleteCar(ctx context.Context, carId string) error {
-	cs.log.Info("attempt to edit car by id")
+	cs.log.Info("attempt to delete car by id")
 	cs.log.Debug("got car id", slog.String("car_id", carId))
 	err := cs.carRepo.DeleteCarById(ctx, carId)
 	if err != nil {
