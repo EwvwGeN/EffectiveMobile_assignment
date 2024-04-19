@@ -8,9 +8,10 @@ import (
 
 type Config struct {
 	LogLevel         string          `yaml:"log_level"`
+	CarInfoGetterUrl string          `yaml:"car_info_getter"`
 	HttpConfig       HttpConfig      `yaml:"http"`
 	ValidatorConfig  ValidatorConfig `yaml:"validator"`
-	CarInfoGetterUrl string          `yaml:"car_info_getter"`
+	PostgresConfig   PostgresConfig  `yaml:"postgres"`
 }
 
 func LoadConfig(path string) (*Config, error) {
