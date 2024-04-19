@@ -4,7 +4,7 @@ http:
   host: localhost
 postgres:
   db_con_format: postgres
-  db_host: localhost
+  db_host: postgres
   db_port: 5432
   db_user: user
   db_pass: pwd

@@ -3,10 +3,12 @@ services:
 
   postgres:
     image: postgres:13.3
+    env_file:
+      .env
     environment:
-      POSTGRES_DB: "test-db"
-      POSTGRES_USER: "user"
-      POSTGRES_PASSWORD: "pwd"
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_DB_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASS}
     volumes:
       - ./storage/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg-data:/var/lib/postgresql/data
@@ -30,6 +32,20 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     ports:
       - "5050:80"
+    networks:
+      - assignment
+
+  server:
+    env_file:
+      .env
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - 9099:${HTTP_PORT}/tcp
+    depends_on:
+      postgres:
+        condition: "service_healthy"
     networks:
       - assignment
 
