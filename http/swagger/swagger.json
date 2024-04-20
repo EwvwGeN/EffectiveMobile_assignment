@@ -1,0 +1,326 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Swagger для микросервиса Cars",
+        "title": "Swagger для микросервиса Cars",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:9099",
+    "basePath": "/",
+    "paths": {
+        "/api/car/{carId}": {
+            "get": {
+                "description": "Получение данных машины по ее идентификатору",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Получить данные машины",
+                "operationId": "Car_get_one",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор машины",
+                        "name": "carId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/httpmodels.CarGetOneResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/car/{carId}/delete": {
+            "delete": {
+                "description": "Удаление машины по ее идентификатору",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Удалить машину",
+                "operationId": "Car_delete",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор машины",
+                        "name": "carId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/car/{carId}/edit": {
+            "patch": {
+                "description": "Изменение данных машины по ее идентификатору",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Изменить данные машины",
+                "operationId": "Car_edit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Идентификатор машины",
+                        "name": "carId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новые данные машины",
+                        "name": "carNewData",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/cars": {
+            "get": {
+                "description": "Получение данных машин с фильтром и пагинацией\n\nФильтр включает в себя 2 необязательных и 1 обязательный параметр\ncol_name=UnionCondition:Operator:Value\nГде:\nUnionCondition(необязательный) - условия включения с другими фильтрами or/and (по умолчанию and)\nOperator(необязательный) - логический оператор (eq,neq,gt,get,lt,let,like) (по умолчанию eq)\nValue(обязательный) - само значение для фильтра",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Получить данные машин с фильтром и пагинацией",
+                "operationId": "Car_get_all",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": "like:X123XX150",
+                        "description": "Фильтр для поля регистрационного номера",
+                        "name": "reg_nums",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": "or:like:Lada",
+                        "description": "Фильтр для поля марки",
+                        "name": "marks",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Фильтр для поля модели",
+                        "name": "models",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "example": "and:gt:2001",
+                        "description": "Фильтр для поля года",
+                        "name": "year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Фильтр для поля имени владельца",
+                        "name": "owner_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Фильтр для поля фамилии владельца",
+                        "name": "owner_surname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "multi",
+                        "description": "Фильтр для поля отчества владельца",
+                        "name": "owner_patronymic",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Количество записей на странице",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Количество пропущенных записей",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/httpmodels.CarGetAllResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        },
+        "/api/cars/add": {
+            "post": {
+                "description": "Добавление машины по ее регистрационному номеру",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Car"
+                ],
+                "summary": "Добавить машину",
+                "operationId": "Car_add",
+                "parameters": [
+                    {
+                        "description": "Регистрационные номера машины",
+                        "name": "regNums",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "example": "{\n\r \"regNums\": [\"string\"]\n\r}"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "httpmodels.CarGetAllResponse": {
+            "type": "object",
+            "properties": {
+                "cars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Car"
+                    }
+                }
+            }
+        },
+        "httpmodels.CarGetOneResponse": {
+            "type": "object",
+            "properties": {
+                "car": {
+                    "$ref": "#/definitions/models.Car"
+                }
+            }
+        },
+        "models.Car": {
+            "type": "object",
+            "properties": {
+                "carId": {
+                    "type": "integer"
+                },
+                "mark": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "owner": {
+                    "$ref": "#/definitions/models.Owner"
+                },
+                "regNum": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Owner": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

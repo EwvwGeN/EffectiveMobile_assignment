@@ -33,6 +33,16 @@ const (
 	ownerPatronymicFieldName = "owner_patronymic"
 )
 
+// @summary Получить данные машины
+// @tags Car
+// @description Получение данных машины по ее идентификатору
+// @id Car_get_one
+// @produce json
+// @Param carId path string true "Идентификатор машины"
+// @Router /api/car/{carId} [get]
+// @Success 200 {object} httpmodels.CarGetOneResponse
+// @Failure 400
+//
 func CarGetOne(logger *slog.Logger, carGetter carOneGetter) http.HandlerFunc {
 	log := logger.With(slog.String("handler", "get_one_car"))
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +76,31 @@ func CarGetOne(logger *slog.Logger, carGetter carOneGetter) http.HandlerFunc {
 	}
 }
 
+// @summary Получить данные машин с фильтром и пагинацией
+// @tags Car
+// @description Получение данных машин с фильтром и пагинацией
+// @description
+// @description Фильтр включает в себя 2 необязательных и 1 обязательный параметр
+// @description col_name=UnionCondition:Operator:Value
+// @description Где:
+// @description UnionCondition(необязательный) - условия включения с другими фильтрами or/and (по умолчанию and)
+// @description Operator(необязательный) - логический оператор (eq,neq,gt,get,lt,let,like) (по умолчанию eq)
+// @description Value(обязательный) - само значение для фильтра
+// @id Car_get_all
+// @produce json
+// @Param reg_nums query []string false "Фильтр для поля регистрационного номера" example(like:X123XX150) collectionFormat(multi)
+// @Param marks query []string false "Фильтр для поля марки" example(or:like:Lada) collectionFormat(multi)
+// @Param models query []string false "Фильтр для поля модели" collectionFormat(multi)
+// @Param year query []string false "Фильтр для поля года" example(and:gt:2001) collectionFormat(multi)
+// @Param owner_name query []string false "Фильтр для поля имени владельца" collectionFormat(multi)
+// @Param owner_surname query []string false "Фильтр для поля фамилии владельца" collectionFormat(multi)
+// @Param owner_patronymic query []string false "Фильтр для поля отчества владельца" collectionFormat(multi)
+// @Param limit query integer false "Количество записей на странице" minimum(1)
+// @Param offset query integer false "Количество пропущенных записей"
+// @Router /api/cars [get]
+// @Success 200 {object} httpmodels.CarGetAllResponse
+// @Failure 400
+//
 func CarGetAll(logger *slog.Logger, carGetter carAllGetter, fAdder filterAdder) http.HandlerFunc {
 	log := logger.With(slog.String("handler", "get_all_cars"))
 	return func(w http.ResponseWriter, r *http.Request) {

@@ -12,6 +12,16 @@ type carDeleter interface {
 	DeleteCar(context.Context, string) error
 }
 
+// @summary Удалить машину
+// @tags Car
+// @description Удаление машины по ее идентификатору
+// @id Car_delete
+// @produce plain
+// @Param carId path string true "Идентификатор машины"
+// @Router /api/car/{carId}/delete [delete]
+// @Success 200
+// @Failure 400
+//
 func CarDelete(logger *slog.Logger, cDeleter carDeleter) http.HandlerFunc {
 	log := logger.With(slog.String("handler", "delete_car"))
 	return func(w http.ResponseWriter, r *http.Request) {

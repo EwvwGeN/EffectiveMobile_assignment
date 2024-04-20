@@ -18,6 +18,18 @@ type carEditor interface {
 	EditCar(context.Context, string, models.CarForPatch) error
 }
 
+// @summary Изменить данные машины
+// @tags Car
+// @description Изменение данных машины по ее идентификатору
+// @id Car_edit
+// @accept json
+// @produce plain
+// @Param carId path string true "Идентификатор машины"
+// @Param carNewData body models.Car false "Новые данные машины"
+// @Router /api/car/{carId}/edit [patch]
+// @Success 200
+// @Failure 400
+//
 func CarEdit(logger *slog.Logger, validCfg config.ValidatorConfig, cEdditor carEditor) http.HandlerFunc {
 	log := logger.With(slog.String("handler", "edit_car"))
 	currentYear := uint16(time.Now().Year())
