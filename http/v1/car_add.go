@@ -15,6 +15,17 @@ type carAdder interface {
 	AddCar(context.Context, []string) error
 }
 
+// @summary Добавить машину
+// @tags Car
+// @description Добавление машины по ее регистрационному номеру
+// @id Car_add
+// @accept json
+// @produce plain
+// @Param regNums body []string true "Регистрационные номера машины" SchemaExample({\n\r "regNums": ["string"]\n\r}) 
+// @Router /api/cars/add [post]
+// @Success 201
+// @Failure 400
+//
 func CarAdd(logger *slog.Logger, cAdder carAdder) http.HandlerFunc {
 	log := logger.With(slog.String("handler", "add_cars"))
 	return func(w http.ResponseWriter, r *http.Request) {

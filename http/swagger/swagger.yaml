@@ -1,0 +1,227 @@
+basePath: /
+definitions:
+  httpmodels.CarGetAllResponse:
+    properties:
+      cars:
+        items:
+          $ref: '#/definitions/models.Car'
+        type: array
+    type: object
+  httpmodels.CarGetOneResponse:
+    properties:
+      car:
+        $ref: '#/definitions/models.Car'
+    type: object
+  models.Car:
+    properties:
+      carId:
+        type: integer
+      mark:
+        type: string
+      model:
+        type: string
+      owner:
+        $ref: '#/definitions/models.Owner'
+      regNum:
+        type: string
+      year:
+        type: integer
+    type: object
+  models.Owner:
+    properties:
+      name:
+        type: string
+      patronymic:
+        type: string
+      surname:
+        type: string
+    type: object
+host: localhost:9099
+info:
+  contact: {}
+  description: Swagger для микросервиса Cars
+  title: Swagger для микросервиса Cars
+  version: "1.0"
+paths:
+  /api/car/{carId}:
+    get:
+      description: Получение данных машины по ее идентификатору
+      operationId: Car_get_one
+      parameters:
+      - description: Идентификатор машины
+        in: path
+        name: carId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpmodels.CarGetOneResponse'
+        "400":
+          description: Bad Request
+      summary: Получить данные машины
+      tags:
+      - Car
+  /api/car/{carId}/delete:
+    delete:
+      description: Удаление машины по ее идентификатору
+      operationId: Car_delete
+      parameters:
+      - description: Идентификатор машины
+        in: path
+        name: carId
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Удалить машину
+      tags:
+      - Car
+  /api/car/{carId}/edit:
+    patch:
+      consumes:
+      - application/json
+      description: Изменение данных машины по ее идентификатору
+      operationId: Car_edit
+      parameters:
+      - description: Идентификатор машины
+        in: path
+        name: carId
+        required: true
+        type: string
+      - description: Новые данные машины
+        in: body
+        name: carNewData
+        schema:
+          $ref: '#/definitions/models.Car'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Изменить данные машины
+      tags:
+      - Car
+  /api/cars:
+    get:
+      description: |-
+        Получение данных машин с фильтром и пагинацией
+
+        Фильтр включает в себя 2 необязательных и 1 обязательный параметр
+        col_name=UnionCondition:Operator:Value
+        Где:
+        UnionCondition(необязательный) - условия включения с другими фильтрами or/and (по умолчанию and)
+        Operator(необязательный) - логический оператор (eq,neq,gt,get,lt,let,like) (по умолчанию eq)
+        Value(обязательный) - само значение для фильтра
+      operationId: Car_get_all
+      parameters:
+      - collectionFormat: multi
+        description: Фильтр для поля регистрационного номера
+        example: like:X123XX150
+        in: query
+        items:
+          type: string
+        name: reg_nums
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля марки
+        example: or:like:Lada
+        in: query
+        items:
+          type: string
+        name: marks
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля модели
+        in: query
+        items:
+          type: string
+        name: models
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля года
+        example: and:gt:2001
+        in: query
+        items:
+          type: string
+        name: year
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля имени владельца
+        in: query
+        items:
+          type: string
+        name: owner_name
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля фамилии владельца
+        in: query
+        items:
+          type: string
+        name: owner_surname
+        type: array
+      - collectionFormat: multi
+        description: Фильтр для поля отчества владельца
+        in: query
+        items:
+          type: string
+        name: owner_patronymic
+        type: array
+      - description: Количество записей на странице
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Количество пропущенных записей
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpmodels.CarGetAllResponse'
+        "400":
+          description: Bad Request
+      summary: Получить данные машин с фильтром и пагинацией
+      tags:
+      - Car
+  /api/cars/add:
+    post:
+      consumes:
+      - application/json
+      description: Добавление машины по ее регистрационному номеру
+      operationId: Car_add
+      parameters:
+      - description: Регистрационные номера машины
+        in: body
+        name: regNums
+        required: true
+        schema:
+          example: "{\n\r \"regNums\": [\"string\"]\n\r}"
+          items:
+            type: string
+          type: array
+      produces:
+      - text/plain
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+      summary: Добавить машину
+      tags:
+      - Car
+swagger: "2.0"

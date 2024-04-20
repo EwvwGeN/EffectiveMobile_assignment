@@ -18,6 +18,10 @@ import (
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/server"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/service"
 	"github.com/EwvwGeN/EffectiveMobile_assignment/internal/storage/postgres"
+
+	_ "github.com/EwvwGeN/EffectiveMobile_assignment/http/swagger"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 var (
@@ -27,6 +31,14 @@ var (
 func init() {
 	flag.StringVar(&configPath, "config", "", "path to config file")
 }
+
+// @title Swagger для микросервиса Cars
+// @version 1.0
+// @description Swagger для микросервиса Cars
+//
+// @host localhost:9099
+// @BasePath /
+//go:generate swag init --parseDependency --parseInternal  -d .,../../http/v1 -o ../../http/swagger/
 func main() {
 	flag.Parse()
 	cfg, err := c.LoadConfig(configPath)
@@ -78,6 +90,14 @@ func main() {
 		"/api/car/{carId}/delete",
 		v1.CarDelete(logger, carService),
 		http.MethodDelete,
+	)
+	swagParams := []func(*httpSwagger.Config){
+		httpSwagger.URL("doc.json"),
+	}
+	hserver.RegisterHandler(
+		"/api/swagger/{*}",
+		httpSwagger.Handler(swagParams...),
+		http.MethodGet,
 	)
 
 	logger.Info("loading end")
